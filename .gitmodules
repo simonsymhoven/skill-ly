@@ -1,0 +1,8 @@
+[submodule "skill-ly-frontend"]
+	path = skill-ly-frontend
+	url = https://github.com/simonsymhoven/skill-ly-frontend
+	branch = master
+[submodule "skill-ly-backend"]
+	path = skill-ly-backend
+	url = https://github.com/simonsymhoven/skill-ly-backend
+	branch = master

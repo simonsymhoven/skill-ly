@@ -1,0 +1,43 @@
+version: "3.7"
+
+services:
+  dbpostgresql:
+    image: postgres
+    container_name: dbpostgresql
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_PASSWORD=123
+    volumes:
+      - tmpvolume:/var/lib/postgresql
+    networks:
+      - backendNetwork
+
+  springapi:
+    build: ./skill-ly-spring-boot/
+    container_name: springapi
+    ports:
+      - "8080:8080"
+    depends_on:
+      - dbpostgresql
+    networks:
+      - backendNetwork
+      - frontendNetwork
+
+  angular:
+    build: ./skill-ly-angular-app/
+    container_name: angular-webapp
+    ports:
+      - "4200:80"
+    depends_on:
+      - springapi
+    networks:
+      - frontendNetwork
+
+
+volumes:
+  tmpvolume:
+
+networks:
+  backendNetwork:
+  frontendNetwork:

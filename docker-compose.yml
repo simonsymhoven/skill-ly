@@ -1,0 +1,59 @@
+version: "3.7"
+
+services:
+  dbpostgresql:
+    image: postgres
+    container_name: dbpostgresql
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_PASSWORD=123
+    volumes:
+      - tmpvolume:/var/lib/postgresql
+    networks:
+      - backendNetwork
+
+  springapi:
+    image: openjdk:12
+    container_name: springapi
+    ports:
+      - "8080:8080"
+    depends_on:
+      - dbpostgresql
+    volumes:
+      - ./skill-ly-spring-boot/target/skill-ly-spring-boot-0.1.2-SNAPSHOT.jar:/application.jar
+    command: ["java","-Djava.security.egd=file:/dev/./urandom","-jar","application.jar"]
+    networks:
+      - backendNetwork
+      - frontendNetwork
+
+  angular:
+    image: nginx:alpine
+    container_name: angular-webapp
+    ports:
+      - "4200:80"
+    depends_on:
+      - springapi
+    volumes:
+      - ./skill-ly-angular-app/nginx.conf:/etc/nginx/nginx.conf
+      - ./skill-ly-angular-app/dist/skillbatz-frontend/:/usr/share/nginx/html
+    networks:
+      - frontendNetwork
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: pgadmin@pgadmin4.org
+      PGADMIN_DEFAULT_PASSWORD: admin
+    depends_on:
+      - dbpostgresql
+    ports:
+      - "5050:80"
+        
+volumes:
+  tmpvolume:
+
+networks:
+  backendNetwork:
+  frontendNetwork:
